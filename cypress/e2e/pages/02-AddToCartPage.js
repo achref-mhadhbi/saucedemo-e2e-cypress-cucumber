@@ -1,8 +1,10 @@
-export default new class AddToCartPage {
+export default new (class AddToCartPage {
   itemLocator = ".inventory_item";
   cartBadgeNumbLocator = ".shopping_cart_badge";
   cartLocator = ".shopping_cart_link";
-  productNameLocator = ".inventory_item_name";
+  productInCartLocator = ".cart_item";
+  productPriceLocator = ".inventory_item_price";
+  productQuantityLocator=".cart_quantity"
   addToCart(product) {
     cy.get(this.itemLocator)
       .contains(product)
@@ -17,9 +19,14 @@ export default new class AddToCartPage {
     cy.get(this.cartLocator).click();
   }
   verifCartItems(dataTable) {
-    const products = dataTable.rawTable.flat();
-    products.forEach((productName, index) => {
-      cy.get(this.productNameLocator).eq(index).should("have.text", productName);
+    const products = dataTable.hashes();
+    products.forEach(product => {
+  cy.contains(this.productInCartLocator, product.name)
+    .within(() => {
+      cy.get(this.productPriceLocator).should("have.text", product.price);
+      cy.get(this.productQuantityLocator).should("have.text", product.quantity);
     });
+});
+
   }
-}
+})();
